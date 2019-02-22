@@ -1,39 +1,84 @@
 <template>
-<v-container>
-  <div>
-    <v-btn color="success">Success</v-btn>
-    <v-btn color="error">Error</v-btn>
-    <v-btn color="warning">Warning</v-btn>
-    <v-btn color="info">Info</v-btn>
-    テキスト表示
-    
-    <v-icon>fa-lock</v-icon>
-    <v-btn icon><v-icon>arrow_right</v-icon></v-btn>
-    <v-btn icon><v-icon>fa-lock</v-icon></v-btn>
-    <v-btn icon><v-icon>mdi-anchor</v-icon></v-btn>
-    |<v-icon>anchor</v-icon>
-  </div>
-  <v-footer app>
-    <v-layout justify-center row wrap>
-      <v-flex primary lighten-1 py-3 text-xs-center white--text xs12>
-        &copy;2018 — <strong>Sample</strong>
-      </v-flex>
-    </v-layout>
-  </v-footer>
-</v-container>
+  <v-container>
+    <!-- エラーメッセージ出力 -->
+    <v-alert type="warning" :value="true" dismissible v-if="errMessage">{{ errMessage }}</v-alert>
+    <v-list two-line class="transparent">
+      <v-list-tile v-for="item in list" :key="item.id" :to="`/blog/${item.id}`">
+        <v-list-tile-avatar>
+          <img :src="item.thumb">
+        </v-list-tile-avatar>
+
+        <v-list-tile-content>
+          <v-list-tile-title v-html="item.name"></v-list-tile-title>
+          <v-list-tile-sub-title v-html="item.subtitle"></v-list-tile-sub-title>
+        </v-list-tile-content>
+      </v-list-tile>
+    </v-list>
+    <no-ssr><infinite-loading @infinite="infiniteHandler"><span slot="no-more">ー ここで終了 ー</span></infinite-loading></no-ssr>
+  </v-container>
 </template>
+
 <script>
+import InfiniteLoading from 'vue-infinite-loading'
+
 export default {
-  // ライフライクルイベント
-  beforeCreate () {
-    console.log('#beforeCreate - サーバクライアント共通イベント')
+  components: {
+    InfiniteLoading,
   },
-  created () {
-    console.log('#created - サーバクライアント共通イベント')
+  data() {
+    return {
+      page: 0,
+      list: [],
+      errMessage: null
+    }
   },
+  // 初回表示データ取得
+  asyncData ({ app, params, error }) {
+    // ブログ一覧を取得
+    return app.$axios.get(`/api/blog`, {
+      params: {
+        page: 1,
+      },
+    }).then((res) => {
+      if (res.data.code === 404) {
+        error({ statusCode: 404 })
+        return
+      }
+      return { list: res.data.list, page: 1 }
+    }).catch((e) => {
+      error({ statusCode: 500 })
+    })
+  },
+  methods: {
+    infiniteHandler($state) {
+      this.$axios.get(`/api/blog`, {
+        params: {
+          page: this.page + 1,
+        },
+      }).then(({ data }) => {
+        if (data.code === 200) {    // 一覧データを取得した場合
+          if (data.list.length > 0) {
+            this.page++
+            this.list.push(...data.list)
+            $state.loaded()
+          }
+        } else {    // 取得データなしの場合は終了
+          $state.complete()
+        }
+      }).catch((e) => {
+        $state.complete()
+        this.errMessage = e.message
+      })
+    }
+  },
+  // ##### スクロール位置を保存 #####
   mounted(){
-    console.log('#mounted - クライアント専用イベント')
-    //alert(this.$store.state.authUser); // or console.log(this.number) or {{ number }} in template
+    setTimeout(() => {
+      window.scrollTo(0, this.$store.state.viewState.blogListYPos);
+   }, 100);
   },
+  beforeDestroy: function () {
+    this.$store.dispatch('viewState/updateBlogListPos', window.pageYOffset)
+  }
 }
 </script>
