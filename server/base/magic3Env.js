@@ -28,7 +28,7 @@ class Magic3Env {
     // Magic3のシステム情報取得
     this._getServerInfo((err, results) => {
       if (err) {
-        log.error('Magic3システム情報取得エラー コード=' + err)
+        log.error('#magic3Env: Magic3システム情報取得エラー')
         return
       }
 
@@ -85,7 +85,7 @@ class Magic3Env {
     const baseDb = new BaseDb(this.pool)
 
     const sql = 'SELECT * FROM _system_config ORDER BY sc_id'
-    baseDb.selectRecord(sql, (err, result) => {
+    baseDb.selectRecord(sql, [], (err, result) => {
       if (err) {
         return callback(true)
       }
