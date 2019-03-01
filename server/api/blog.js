@@ -2,7 +2,11 @@ const express = require('express')
 const router = express.Router()
 const BlogDb = require(`${appRoot}/server/db/blogDb`)
 const macroConvert = require(`${appRoot}/server/base/macroConvert`)
+const Magic3Env = require(`${appRoot}/server/base/magic3Env`)
+const Magic3Blog = require(`${appRoot}/server/base/magic3Blog`)
 const { query, validationResult } = require('express-validator/check')
+const truncate = require('truncate')
+const MAX_DESC_LENGTH = 20 // 説明文最大長
 
 router.get('/', [
   // エラーチェック定義
@@ -27,9 +31,17 @@ router.get('/', [
       for (let i = 0; i < result.length; i++) {
         let row = result[i]
 
-        let thumbUrl = ''
-        if (row.be_thumb_src) thumbUrl = magic3Env.getResourceUrl() + row.be_thumb_src
-        list.push({ id: row.be_id, name: row.be_name, thumb: thumbUrl })
+        // アイキャッチ画像取得
+        const thumbUrl = Magic3Blog.getEyecatchImageUrl(result[i].be_thumb_filename, 'l', row.be_thumb_src/* 画像がない場合のデフォルト画像 */)
+
+        // 記事概要
+        let desc = ''
+        if (!empty(result[i].be_thumb_description)) desc = result[i].be_description
+
+        if (empty(desc)) {
+          desc = truncate(striptags(result[i].be_html), MAX_DESC_LENGTH) // HTMLタグ削除、最大長設定
+        }
+        list.push({ id: row.be_id, name: row.be_name, desc: desc, thumb: thumbUrl })
       }
       // 取得データを返す
       res.json({ code: 200, list: list })

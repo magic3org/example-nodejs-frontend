@@ -13,8 +13,10 @@ const logger = require('./logger')
 exports.error = (message) => {
   logger.error(message)
 }
-exports.dbError = (errObj, code) => {
+exports.dbError = (errObj, code, optionMessage, optionObj) => {
   if (code) errObj.optionCode = '[db-' + code + ']' // オプションメッセーにコード番号追加
+  if (optionMessage) errObj.optionMessage = optionMessage
+  if (optionObj) errObj.optionObj = optionObj
   logger.error(errObj)
 }
 exports.warn = (message) => {

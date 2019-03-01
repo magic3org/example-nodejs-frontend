@@ -31,22 +31,26 @@ var options = {
 // コーススタックの出力
 // 呼び出し引数にエラーオブジェクトある場合はコールスタックを出力
 const errorStackTracerFormat = format(info => {
-  if (info instanceof Error) {    // エラーオブジェクトの場合
+  if (info instanceof Error) { // エラーオブジェクトの場合
     return Object.assign({}, info, {
       stack: info.stack,
-      message: info.message,   // エラーオブジェクトに設定されているメッセージを取得
-      optionCode: info.optionCode     // logモジュールで付加したパラメータ
+      message: info.message, // エラーオブジェクトに設定されているメッセージを取得
+      optionCode: info.optionCode, // logモジュールで付加したパラメータ
+      optionMessage: info.optionMessage, // logモジュールで付加したパラメータ
+      optionObj: info.optionObj // logモジュールで付加したオブジェクトパラメータ
     })
   }
   return info
 })
 
 // メッセージの出力フォーマット
-const customFormat = printf(({ level, message, label, timestamp, stack, optionCode }) => {
+const customFormat = printf(({ level, message, label, timestamp, stack, optionCode, optionMessage, optionObj }) => {
   let msgFormat = `${timestamp} [${level}]`
-  if (stack){
+  if (stack) {
     if (optionCode) msgFormat += ` ${optionCode}`
-    msgFormat += ` ${stack}`    // 関数スタック出力
+    if (optionMessage) msgFormat += ` ${optionMessage}`
+    if (optionObj) msgFormat += ' ' + JSON.stringify(optionObj)
+    msgFormat += ` ${stack}` // 関数スタック出力
   } else {
     msgFormat += ` ${message}`
   }

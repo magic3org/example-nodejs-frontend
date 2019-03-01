@@ -3,21 +3,27 @@
     <!-- エラーメッセージ出力 -->
     <v-alert type="warning" :value="true" dismissible v-if="errMessage">{{ errMessage }}</v-alert>
     <v-list two-line class="transparent">
-      <v-list-tile v-for="item in list" :key="item.id" :to="`/blog/${item.id}`">
-        <v-list-tile-avatar>
+      <v-list-tile v-for="item in list" :key="item.id" :to="`/blog/${item.id}`" class="blog-list">
+        <v-list-tile-avatar size="80">
           <img :src="item.thumb">
         </v-list-tile-avatar>
-
         <v-list-tile-content>
           <v-list-tile-title v-html="item.name"></v-list-tile-title>
-          <v-list-tile-sub-title v-html="item.subtitle"></v-list-tile-sub-title>
+          <v-list-tile-sub-title v-html="item.desc"></v-list-tile-sub-title>
         </v-list-tile-content>
       </v-list-tile>
     </v-list>
     <no-ssr><infinite-loading @infinite="infiniteHandler"><span slot="no-more">ー ここで終了 ー</span></infinite-loading></no-ssr>
   </v-container>
 </template>
-
+<style>
+.blog-list a.v-list__tile.v-list__tile--link {
+  height:120px;
+}
+.blog-list .v-list__tile__avatar {
+  margin-right: 5px;
+}
+</style>
 <script>
 import InfiniteLoading from 'vue-infinite-loading'
 

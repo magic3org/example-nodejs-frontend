@@ -7,8 +7,21 @@
  * @since  2019/2/10
  */
 const BaseDb = require(`${appRoot}/server/base/baseDb`)
+const async = require('async')
 
 class Magic3Env {
+  /**
+   * コンストラクタ
+   *
+   * @since  2019/2/26
+   * @access public
+   */
+  /*constructor () {
+  //  this.rootUrl = ''
+  //  this.resourceUrl = ''
+  //  this.configArray = {} // システム定義
+  //  this.blogConfigArray = {} // ブログ定義
+  }*/
   /**
    * 初期化処理
    *
@@ -19,39 +32,69 @@ class Magic3Env {
    * @param  {Object} pool DB接続取得用のpoolオブジェクト
    * @return {Object}      このオブジェクトの参照
    */
-  init (pool) {
+  static init (pool) {
+    const self = Magic3Env
+
     // 初期化は1回のみ
-    if (this.isInit) return this
+    if (self.isInit) return
 
-    this.pool = pool
+    self.pool = pool
 
-    // Magic3のシステム情報取得
-    this._getServerInfo((err, results) => {
-      if (err) {
-        log.error('#magic3Env: Magic3システム情報取得エラー')
-        return
+    async.waterfall([
+      function (callback) {
+        // Magic3のシステム情報取得
+        self._getServerInfo((err, results) => {
+          if (err) {
+            log.error('#magic3Env: Magic3システム情報取得エラー')
+            return
+          }
+
+          // Magic3システム定義値取得
+          let configArray = {}
+          for (var i in results) {
+            let configId = results[i].sc_id
+            if (configId === 'server_url') {
+              self.rootUrl = results[i].sc_value
+              self.resourceUrl = results[i].sc_value + '/resource'
+            } else if (configId === 'server_dir') {
+              self.rootDir = results[i].sc_value
+              self.resourceDir = results[i].sc_value + '/resource'
+            }
+            configArray[results[i].sc_id] = results[i].sc_value
+          }
+          self.configArray = configArray
+
+          log.info('#magic3Env: システム定義取得')
+          callback(null)
+        })
+      },
+      function (callback) {
+        // Magic3ブログ定義取得
+        self._getBlogConfig((err, results) => {
+          if (err) {
+            log.error('#magic3Env: Magic3ブログ定義取得エラー')
+            return
+          }
+
+          // Magic3システム定義値取得
+          let configArray = {}
+          for (var i in results) {
+            configArray[results[i].bg_id] = results[i].bg_value
+          }
+          self.blogConfigArray = configArray
+
+          log.info('#magic3Env: ブログ定義取得')
+          callback(null)
+        })
       }
-
-      // Magic3システム定義値取得
-      let configArray = []
-      for (var i in results) {
-        let configId = results[i].sc_id
-        if (configId === 'server_url') {
-          this.rootUrl = results[i].sc_value
-          this.resourceUrl = results[i].sc_value + '/resource'
-        } else if (configId === 'server_dir') {
-          this.rootDir = results[i].sc_value
-          this.resourceDir = results[i].sc_value + '/resource'
-        }
-        configArray[results[i].sc_id] = results[i].sc_value
-      }
-      this.configArray = configArray
+    ], function (err, results) {
+      if (err) throw err
 
       // 初期化完了
-      this.isInit = true
+      self.isInit = true // 初期化完了
       log.info('#magic3Env: 初期化終了')
     })
-    return this
+    return self
   }
   /**
    * Magic3ルートURL取得
@@ -60,8 +103,8 @@ class Magic3Env {
    * @access public
    * @return {string} URL
    */
-  getRootUrl () {
-    return this.rootUrl
+  static getRootUrl () {
+    return Magic3Env.rootUrl
   }
   /**
    * Magic3ルートディレクトリ取得
@@ -70,8 +113,21 @@ class Magic3Env {
    * @access public
    * @return {string} ディレクトリパス
    */
-  getResourceUrl () {
-    return this.resourceUrl
+  static getResourceUrl () {
+    return Magic3Env.resourceUrl
+  }
+  /**
+   * ブログ定義値取得
+   *
+   * @since  2019/2/26
+   * @access public
+   * @param {string} id 定義ID
+   * @return {string} 定義値
+   */
+  static getBlogConfigValue (id) {
+    let value = Magic3Env.blogConfigArray[id]
+    if (!value) value = ''
+    return value
   }
   /**
    * Magic3システム定義データ取得
@@ -80,9 +136,10 @@ class Magic3Env {
    * @access private
    * @param  {callback} callback コールバック関数
    */
-  _getServerInfo (callback) {
+  static _getServerInfo (callback) {
     // DB接続オブジェクト取得
-    const baseDb = new BaseDb(this.pool)
+    const self = Magic3Env
+    const baseDb = new BaseDb(self.pool)
 
     const sql = 'SELECT * FROM _system_config ORDER BY sc_id'
     baseDb.selectRecord(sql, [], (err, result) => {
@@ -92,5 +149,26 @@ class Magic3Env {
       callback(false, result)
     })
   }
+  /**
+   * Magic3ブログ定義取得
+   *
+   * @since  2019/2/25
+   * @access private
+   * @param  {callback} callback コールバック関数
+   */
+  static _getBlogConfig (callback) {
+    // DB接続オブジェクト取得
+    const self = Magic3Env
+    const baseDb = new BaseDb(self.pool)
+
+    const sql = 'SELECT * FROM blog_config ORDER BY bg_id'
+    baseDb.selectRecord(sql, [], (err, result) => {
+      if (err) {
+        return callback(true)
+      }
+      callback(false, result)
+    })
+  }
 }
-module.exports = new Magic3Env()
+//module.exports = new Magic3Env()
+module.exports = Magic3Env

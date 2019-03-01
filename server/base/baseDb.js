@@ -16,7 +16,9 @@ class BaseDb {
           connection.release()
           if (err) {
             const errCode = 11
-            log.dbError(err, errCode)
+            const optionMessage = 'クエリー実行エラー'
+            const optionObj = { query: query, params: params }
+            log.dbError(err, errCode, optionMessage, optionObj)
             return callback(true)
           }
           callback(false, result)
@@ -55,10 +57,10 @@ class BaseDb {
         })*/
         this.pool.query = util.promisify(this.pool.query)
         var records = await this.pool.query(query)
-        //this.pool.end()
+        // this.pool.end()
 
       console.log(records)
-      //this.pool.end()
+      // this.pool.end()
       console.log('wait end....')
     } catch (err) {
       const errCode = 21
@@ -66,8 +68,8 @@ class BaseDb {
       return callback(true)
     }
   }
-  close (){
-    this.pool.end(function(err) {
+  close () {
+    this.pool.end(function (err) {
       if (err) {
         const errCode = 13
         log.dbError(err, errCode)

@@ -6,6 +6,7 @@
  * @author Naoki Hirata
  * @since  2019/2/10
  */
+const Magic3Env = require(`${appRoot}/server/base/magic3Env`)
 const MAGIC3_ROOT_URL = '[#M3_ROOT_URL#]'
 
 class MacroConvert {
@@ -18,7 +19,7 @@ class MacroConvert {
    * @return {string}     変換後データ
    */
   getMagic3Content (src) {
-    const magic3Url = global.magic3Env.getRootUrl()
+    const magic3Url = Magic3Env.getRootUrl()
     let dest = src.replace(MAGIC3_ROOT_URL, magic3Url)
     return dest
   }

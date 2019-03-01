@@ -5,6 +5,8 @@ const bodyParser = require('body-parser')
 
 // グローバルモジュールの作成
 global.appRoot = require('app-root-path') // プロジェクトのルートパス
+global.empty = require('is-empty')
+global.striptags = require('striptags')
 
 // サーバ実行環境取得
 const config = require(`${appRoot}/server/env/config`)
@@ -45,7 +47,8 @@ app.use(function (req, res, next) {
 })
 
 // Magic3環境モジュール初期化
-global.magic3Env = require(`${appRoot}/server/base/magic3Env`).init(pool)
+//global.magic3Env = new (require(`${appRoot}/server/base/magic3Env`))().init(pool)
+require(`${appRoot}/server/base/magic3Env`).init(pool)
 
 // ########## サーバ起動 ##########
 app.set('port', port)
