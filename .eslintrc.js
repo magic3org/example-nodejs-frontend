@@ -10,7 +10,9 @@ module.exports = {
     'standard/no-callback-literal': 0,
   },
   globals: {
-    "appRoot": false,
-    "log": false
+    'appRoot': false,
+    'log': false,
+    'empty': false,
+    'striptags': false
   }
 }

@@ -2,19 +2,20 @@
   <v-container>
     <!-- エラーメッセージ出力 -->
     <v-alert type="warning" :value="true" dismissible v-if="errMessage">{{ errMessage }}</v-alert>
-    <v-list two-line class="transparent">
-      <v-list-tile v-for="item in list" :key="item.id" :to="`/blog/${item.id}`" class="blog-list">
-        <v-list-tile-avatar size="80">
-          <img :src="item.thumb">
-        </v-list-tile-avatar>
-        <v-list-tile-content>
-          <v-list-tile-title v-html="item.name"></v-list-tile-title>
-          <v-list-tile-sub-title v-html="item.desc" class="text--primary"></v-list-tile-sub-title>
-          <v-list-tile-sub-title>{{ item.date | dateFormat }}</v-list-tile-sub-title>
-        </v-list-tile-content>
-      </v-list-tile>
-    </v-list>
-    <no-ssr><infinite-loading @infinite="infiniteHandler"><span slot="no-more">ー ここで終了 ー</span></infinite-loading></no-ssr>
+    <v-layout row wrap>
+      <v-flex v-for="item in list" :key="item.index" xs4 d-flex>
+          <v-card flat tile class="d-flex" :to="`/blog/${item.id}`">
+            <v-img :src="item.thumb" :lazy-src="item.thumb" aspect-ratio="1" class="grey lighten-2">
+              <template v-slot:placeholder>
+                <v-layout fill-height align-center justify-center ma-0>
+                  <v-progress-circular indeterminate color="grey lighten-5"></v-progress-circular>
+                </v-layout>
+              </template>
+            </v-img>
+          </v-card>
+      </v-flex>
+      <no-ssr><infinite-loading @infinite="infiniteHandler"><span slot="no-more"></span><span slot="no-results"></span></infinite-loading></no-ssr>
+    </v-layout>
   </v-container>
 </template>
 <style>
@@ -23,7 +24,6 @@
 }
 .blog-list .v-list__tile__avatar {
   width: 100px;
-  /*margin-right:10px;*/
 }
 </style>
 <script>
@@ -44,7 +44,7 @@ export default {
   // 初回表示データ取得
   asyncData ({ app, params, error }) {
     // ブログ一覧を取得
-    return app.$axios.get(`/api/blog`, {
+    return app.$axios.get('/api/blog/gallery', {
       params: {
         page: 1,
       },
@@ -60,7 +60,7 @@ export default {
   },
   methods: {
     infiniteHandler($state) {
-      this.$axios.get(`/api/blog`, {
+      this.$axios.get('/api/blog/gallery', {
         params: {
           page: this.page + 1,
         },
