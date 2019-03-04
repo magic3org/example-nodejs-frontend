@@ -8,20 +8,9 @@
  */
 const BaseDb = require(`${appRoot}/server/base/baseDb`)
 const async = require('async')
+const defaultLang = 'ja'
 
 class Magic3Env {
-  /**
-   * コンストラクタ
-   *
-   * @since  2019/2/26
-   * @access public
-   */
-  /*constructor () {
-  //  this.rootUrl = ''
-  //  this.resourceUrl = ''
-  //  this.configArray = {} // システム定義
-  //  this.blogConfigArray = {} // ブログ定義
-  }*/
   /**
    * 初期化処理
    *
@@ -65,6 +54,25 @@ class Magic3Env {
           self.configArray = configArray
 
           log.info('#magic3Env: システム定義取得')
+          callback(null)
+        })
+      },
+      function (callback) {
+        // Magic3サイト定義取得
+        self._getSiteConfig((err, results) => {
+          if (err) {
+            log.error('#magic3Env: Magic3サイト定義取得エラー')
+            return
+          }
+
+          // Magic3システム定義値取得
+          let configArray = {}
+          for (var i in results) {
+            configArray[results[i].sd_id] = results[i].sd_value
+          }
+          self.siteConfigArray = configArray
+
+          log.info('#magic3Env: サイト定義取得')
           callback(null)
         })
       },
@@ -117,6 +125,19 @@ class Magic3Env {
     return Magic3Env.resourceUrl
   }
   /**
+   * サイト定義値取得
+   *
+   * @since  2019/3/3
+   * @access public
+   * @param {string} id 定義ID
+   * @return {string} 定義値
+   */
+  static getSiteConfigValue (id) {
+    let value = Magic3Env.siteConfigArray[id]
+    if (!value) value = ''
+    return value
+  }
+  /**
    * ブログ定義値取得
    *
    * @since  2019/2/26
@@ -134,7 +155,7 @@ class Magic3Env {
    *
    * @since  2019/2/10
    * @access private
-   * @param  {callback} callback コールバック関数
+   * @param  {function} callback コールバック関数
    */
   static _getServerInfo (callback) {
     // DB接続オブジェクト取得
@@ -150,11 +171,34 @@ class Magic3Env {
     })
   }
   /**
+  * Magic3サイト定義データ取得
+  *
+  * @since  2019/3/3
+  * @access private
+  * @param  {function} callback コールバック関数
+  */
+  static _getSiteConfig (callback) {
+    // DB接続オブジェクト取得
+    const self = Magic3Env
+    const baseDb = new BaseDb(self.pool)
+
+    const sql = 'SELECT sd_id,sd_value FROM _site_def ' +
+                'WHERE sd_deleted = false ' +
+                'AND sd_language_id = ? ' +
+                'ORDER BY sd_id'
+    baseDb.selectRecord(sql, [defaultLang], (err, result) => {
+      if (err) {
+        return callback(true)
+      }
+      callback(false, result)
+    })
+  }
+  /**
    * Magic3ブログ定義取得
    *
    * @since  2019/2/25
    * @access private
-   * @param  {callback} callback コールバック関数
+   * @param  {function} callback コールバック関数
    */
   static _getBlogConfig (callback) {
     // DB接続オブジェクト取得
@@ -170,5 +214,4 @@ class Magic3Env {
     })
   }
 }
-//module.exports = new Magic3Env()
 module.exports = Magic3Env

@@ -7,7 +7,7 @@
  * @since  2019/2/10
  */
 const Magic3Env = require(`${appRoot}/server/base/magic3Env`)
-const MAGIC3_ROOT_URL = '[#M3_ROOT_URL#]'
+const MAGIC3_ROOT_URL = /\[#M3_ROOT_URL#\]/g
 
 class MacroConvert {
   /**
