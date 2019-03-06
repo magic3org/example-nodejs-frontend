@@ -12,7 +12,7 @@
     "generate": "nuxt generate"
   },
   "dependencies": {
-    "@nuxtjs/axios": "^5.3.6",
+    "@nuxtjs/axios": "^5.4.1",
     "app-root-path": "^2.1.0",
     "body-parser": "^1.18.3",
     "cross-env": "^5.2.0",
@@ -30,14 +30,14 @@
     "winston": "^3.2.1"
   },
   "devDependencies": {
-    "@nuxtjs/vuetify": "^0.5.3",
-    "eslint": "^5.13.0",
+    "@nuxtjs/vuetify": "^0.5.5",
+    "eslint": "^5.15.1",
     "eslint-config-standard": "^12.0.0",
     "eslint-plugin-import": "^2.16.0",
     "eslint-plugin-node": "^8.0.1",
     "eslint-plugin-promise": "^4.0.1",
     "eslint-plugin-standard": "^4.0.0",
-    "eslint-plugin-vue": "^5.1.0",
-    "nodemon": "^1.18.9"
+    "eslint-plugin-vue": "^5.2.2",
+    "nodemon": "^1.18.10"
   }
 }
