@@ -38,7 +38,9 @@ module.exports = {
   ** Nuxt.js modules
   */
   modules: [
-    '@nuxtjs/axios',
+    ['@nuxtjs/axios', {
+      baseURL: 'http://localhost:3000' // クライアントからのサーバ接続用URL
+    }],
     '@nuxtjs/vuetify'
   ]
 }
