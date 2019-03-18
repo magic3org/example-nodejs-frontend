@@ -4,8 +4,9 @@
 Magic3で管理しているブログ記事が表示できます。  
 Vue.js, Nuxt.js, Vuetify.js, MySQL接続等使用。
 
-![result](https://github.com/magic3org/example-nodejs-frontend/blob/images/screen1.png)
-![result](https://github.com/magic3org/example-nodejs-frontend/blob/images/screen2.png)
+<img src="https://github.com/magic3org/example-nodejs-frontend/blob/images/screen1.png" width="320">
+![screenimage1](https://github.com/magic3org/example-nodejs-frontend/blob/images/screen1.png)
+![screenimage2](https://github.com/magic3org/example-nodejs-frontend/blob/images/screen2.png)
 
 ## Configration
 Edit db connection to Magic3 Database in server/env/development.json file.  
