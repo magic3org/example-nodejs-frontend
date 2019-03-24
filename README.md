@@ -16,13 +16,7 @@ server/env/development.jsonƒtƒ@ƒCƒ‹‚ğ•ÒW‚µ‚ÄA˜AŒg‚·‚éMagic3‚ÌDB‚ÖÚ‘±‚·‚éİ’è‚
 # install dependencies
 $ npm install
 
-# serve with hot reload at localhost:3000
-$ npm run dev
-
 # build for production and launch server
 $ npm run build
 $ npm start
-
-# generate static project
-$ npm run generate
 ```
