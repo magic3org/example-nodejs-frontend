@@ -12,8 +12,8 @@ server/env/development.jsonƒtƒ@ƒCƒ‹‚ğ•ÒW‚µ‚ÄA˜AŒg‚·‚éMagic3‚ÌDB‚ÖÚ‘±‚·‚éİ’è‚
 Edit db connection to Magic3 Database in server/env/development.json file.  
 
 ### ƒT[ƒoÚ‘±—pURL(Server connect URL)
-nuxt.config.js‚ğAxion€–Ú‚ÌubaseURLvC³‚µ‚ÄƒT[ƒoÚ‘±—p‚ÌURL‚ğİ’è‚µ‚Ü‚·B
-Editing axios parameter in nuxt.config, setup the URL to the server.
+nuxt.config.jsƒtƒ@ƒCƒ‹‚ÌuAPI_URLv‚ÉƒT[ƒoÚ‘±—p‚ÌURL‚ğİ’è‚µ‚Ü‚·B
+Editing 'API_URL' parameter in nuxt.config, configure the URL to the server.
 
 ## Build Setup
 
