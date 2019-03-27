@@ -1,5 +1,7 @@
 const pkg = require('./package')
 
+const API_URL = '' // サーバAPIの公開URL(proxy使用時)
+
 module.exports = {
   mode: 'universal',
 
@@ -39,7 +41,7 @@ module.exports = {
   */
   modules: [
     ['@nuxtjs/axios', {
-      baseURL: 'http://localhost:3000' // クライアントからのサーバ接続用URL
+      baseURL: API_URL || 'http://localhost:3000'
     }],
     '@nuxtjs/vuetify'
   ]
